@@ -36,14 +36,21 @@ class CustomDiskWriter(KeyFrameDiskWriter):
 
         return "_".join([filename, suffix])
 
+def resize_images(images, target_size=(512, 512)):
+    # 调整所有图像的大小为目标大小
+    resized_images = [cv2.resize(img, target_size) for img in images]
+    return resized_images
 
 def calculate_ssim(img1, img2):
     return ssim(img1, img2, data_range=img1.max() - img1.min())
 
 
-def post_process(images_dir: str,threshold = 0.9):
+def post_process(images_dir: str, threshold=0.9):
     image_paths = sorted(glob.glob(f'{images_dir}/*.jpeg'), key=lambda x: int(x.split('_')[-1].split('.')[0]))
     images = [io.imread(path, as_gray=True) for path in image_paths]
+
+    # 调整图像的大小，使它们具有相同的形状（512x512像素）
+    images = resize_images(images, target_size=(512, 512))
 
     image_indices = list(range(len(images)))
     similar_images = set()
@@ -75,15 +82,13 @@ def post_process(images_dir: str,threshold = 0.9):
     return unique_images
 
 
-def main_dir(image_dir):
+def main_dir(image_dir, no_of_frames_to_returned=12):
     if len(sys.argv) == 1:
         dir_path = os.path.join(".", "tests", "data")
     else:
         dir_path = sys.argv[1]
 
     vd = Video()
-
-    no_of_frames_to_returned = 12
 
     diskwriter = KeyFrameDiskWriter(location=image_dir)
 
@@ -93,15 +98,12 @@ def main_dir(image_dir):
     )
 
 
-def main(image_dir,video_file_path):
+def main(image_dir, video_file_path, no_of_frames_to_returned=12):
     # Extract specific number of key frames from video
     # if os.name == 'nt':
     #     multiprocessing.freeze_support()
 
     vd = Video()
-
-    # number of images to be returned
-    no_of_frames_to_returned = 12
 
     diskwriter = KeyFrameDiskWriter(location=image_dir)
 
@@ -116,14 +118,16 @@ def main(image_dir,video_file_path):
 
 
 if __name__ == "__main__":
-    import  argparse
+    import argparse
+
     args = argparse.ArgumentParser()
     args.add_argument("--mp4file", default="zzh_baba.mp4")
     args.add_argument("--save_dir", default="key_frames")
+    args.add_argument('--num_frames_to_returned',default=12)
     args = args.parse_args()
 
     multiprocessing.set_start_method("spawn")
-    main(args.save_dir,args.mp4file)
-    post_process(args.save_dir,threshold=0.95)
+    main(args.save_dir, args.mp4file, no_of_frames_to_returned=args.num_frames_to_returned)
+    post_process(args.save_dir, threshold=0.95)
 
     # main_dir(image_dir)
