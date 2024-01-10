@@ -1,3 +1,6 @@
 [submodule "whisper"]
 	path = whisper
 	url = https://github.com/openai/whisper
+[submodule "Qwen-VL"]
+	path = Qwen-VL
+	url = git@github.com:QwenLM/Qwen-VL.git
