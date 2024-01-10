@@ -6,6 +6,7 @@ pip install python-dotenv
 pip install opencv-python 
 pip install scikit-image
 pip install scikit-learn
+python3 -m pip install -U yt-dlp 
 # on Ubuntu or Debian
 sudo apt update && sudo apt install ffmpeg
 ```

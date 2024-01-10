@@ -6,11 +6,10 @@ import glob
 import os
 import os.path
 import cv2
-import sys, getopt
+import sys
 from Katna.video import Video
 from Katna.writer import KeyFrameDiskWriter
 import multiprocessing
-import ntpath
 from skimage.metrics import structural_similarity as ssim
 from skimage import io
 import numpy as np
@@ -36,10 +35,12 @@ class CustomDiskWriter(KeyFrameDiskWriter):
 
         return "_".join([filename, suffix])
 
+
 def resize_images(images, target_size=(512, 512)):
     # 调整所有图像的大小为目标大小
     resized_images = [cv2.resize(img, target_size) for img in images]
     return resized_images
+
 
 def calculate_ssim(img1, img2):
     return ssim(img1, img2, data_range=img1.max() - img1.min())
@@ -121,9 +122,9 @@ if __name__ == "__main__":
     import argparse
 
     args = argparse.ArgumentParser()
-    args.add_argument("--mp4file", default="zzh_baba.mp4")
+    args.add_argument("--mp4file", default="lol_demo.mp4")
     args.add_argument("--save_dir", default="key_frames")
-    args.add_argument('--num_frames_to_returned',default=12)
+    args.add_argument('--num_frames_to_returned', default=12)
     args = args.parse_args()
 
     multiprocessing.set_start_method("spawn")

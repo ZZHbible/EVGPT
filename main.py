@@ -13,6 +13,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.api_base = os.getenv("OPENAI_API_BASE")
 
+
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
@@ -28,11 +29,14 @@ for image_path in glob.glob(image_dir):
 # base64_image = encode_image(image_path)
 
 def main(args):
-    txt_file = args.mp4file.split('.')[0]+'.txt'
-    s=""
+    txt_file = args.mp4file.split('.')[0] + '.txt'
+    s = ""
     with open(txt_file) as f:
         for row in f.readlines():
-            s+=(row.strip()+',')
+            s += (row.strip() + ',')
+
+    s = ""
+
     response = openai.ChatCompletion.create(
         model="gpt-4-vision-preview",
         # model="gpt-4-0314",
@@ -46,7 +50,7 @@ def main(args):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"你将观看一段视频，其中文字部分如下：\n{s}\n问题为：{args.query}"
+                        "text": f"<你将观看一段视频，其中文字部分如下：\n{s}\n>, 问题为：{args.query}"
                     },
                     *image_list
                 ]
@@ -61,13 +65,13 @@ def main(args):
     )['choices'][0]['message']['content']
     print(response)
 
+
 if __name__ == '__main__':
     import argparse
+
     args = argparse.ArgumentParser()
-    args.add_argument("--mp4file",default="zzh_work.mp4")
-    args.add_argument("--image_path",default="key_frames")
-    args.add_argument("--query",default="能使用异步gather改写代码嘛")
-    args=args.parse_args()
+    args.add_argument("--mp4file", default="zzh_work.mp4")
+    args.add_argument("--image_path", default="key_frames")
+    args.add_argument("--query", default="如何用pytorch 实现图中的式子")
+    args = args.parse_args()
     main(args)
-
-
